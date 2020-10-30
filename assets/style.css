@@ -1,0 +1,220 @@
+#root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #921E5C;
+  background: linear-gradient(
+    90deg,
+    #172048 -20%,
+    #5C0C3C 120%
+  );
+}
+
+#root > header#header {
+  display: flex;
+}
+
+#root > header#header > #header-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 240px;
+  height: 55px;
+}
+
+#root > header#header > #header-logo > img {
+  height: 30px;
+  object-fit: contain;
+}
+
+#root > header#header > #header-title {
+  display: flex;
+  height: 55px;
+  max-height: 55px;
+  min-height: 55px;
+  width: 100%;
+  flex: 1;
+  color: #ffffff;
+  align-items: center;
+  white-space: nowrap;
+  padding-left: 10px;
+}
+
+#root > header#header > #header-title > span {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+#root > section#content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  max-height: calc(100% - 55px);
+  min-height: calc(100% - 55px);
+  overflow: auto;
+  background-color: #5C0C3C;
+}
+
+#root > section#content > #editor-box {
+  width: 100%;
+  max-width: 1000px;
+  background-color: #FFFFFF;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+#root > section#content > #editor-box > #editor-container {
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+div#modal-box {
+  display: flex;
+  flex-direction: column;
+  background-color: #5C0C3C;
+}
+
+header#modal-header {
+  display: flex;
+  align-items: center;
+  height: 55px;
+  max-height: 55px;
+  min-height: 55px;
+  width: 100%;
+  background-color: #43072A;
+  padding: 0 10px;
+}
+
+header#modal-header > h2 {
+  display: flex;
+  flex: 1;
+  color: #ffffff;
+  align-items: center;
+  white-space: nowrap;
+  font-size: 20px;
+  font-weight: 300;
+}
+
+header#modal-header > button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  font-size: 15px;
+  color: #ffffff;
+  background-color: #F38021;
+}
+
+header#modal-header > button:hover {
+  background-color: #924d14;
+}
+
+section#modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  flex: 1;
+  overflow: hidden;
+}
+
+section#modal-content > img#image-cropper {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+section#modal-toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  height: 40px;
+  max-height: 40px;
+  padding: 5px;
+  background-color: #ffffff;
+}
+
+section#modal-toolbar > div.modal-toolbar-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 5px;
+}
+
+section#modal-toolbar > div.modal-toolbar-group > button:first-child {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+section#modal-toolbar > div.modal-toolbar-group > button:last-child {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+section#modal-toolbar > div.modal-toolbar-group > button {
+  min-width: 30px;
+  min-height: 30px;
+  max-height: 30px;
+  outline: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #921E5C;
+  color: #ffffff;
+  border: 0;
+  padding: 0 10px;
+}
+
+section#modal-toolbar > div.modal-toolbar-group > button > * {
+  pointer-events: none;
+}
+
+section#modal-toolbar > div.modal-toolbar-group > button > i {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+footer#modal-footer {
+  display: flex;
+  width: 100%;
+  padding: 10px;
+  justify-content: flex-end;
+}
+
+footer#modal-footer > button {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 35px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background-color: #F38021;
+  border: 2px solid #F38021;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 1px;
+}
+
+footer#modal-footer > button > i {
+  margin-right: 5px;
+}

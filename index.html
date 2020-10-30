@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="./assets/image/favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hippocampus Academic</title>
+  <link href="//fonts.googleapis.com/css2?family=Roboto+Slab:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css" crossorigin="anonymous">
+  <link rel="stylesheet" href="./assets/reset.css">
+  <link rel="stylesheet" href="./assets/style.css">
+  <link rel="stylesheet" href="./assets/micromodal.css">
+
+  <!-- Theme included stylesheets -->
+  <link href="./node_modules/quill/dist/quill.snow.css" rel="stylesheet">
+  <link href="./node_modules/quill/dist/quill.bubble.css" rel="stylesheet">
+  <link href="./node_modules/quill/dist/quill.core.css" rel="stylesheet">
+  <link href="./node_modules/quill-image-uploader/dist/quill.imageUploader.min.css" rel="stylesheet">
+  <link href="./node_modules/cropperjs/dist/cropper.min.css" rel="stylesheet">
+  
+  <script src="./node_modules/quill/dist/quill.min.js"></script>
+  <script src="./node_modules/quill-image-uploader/dist/quill.imageUploader.min.js"></script>
+  <script src="./node_modules/micromodal/dist/micromodal.min.js"></script>
+  <script src="./node_modules/cropperjs/dist/cropper.min.js"></script>
+  <script src="./assets/functions.js"></script>
+</head>
+<body>
+  <div id="root">
+    <header id="header">
+      <div id="header-logo">
+        <img src="assets/image/logo-h.svg" alt="Hippocampus" />
+      </div>
+      <div id="header-title">
+        <span>Título da aula do professor</span>
+      </div>
+    </header>
+    <section id="content">
+      <div id="editor-box">
+        <div id="editor-container"></div>
+      </div>
+    </section>
+    <div class="modal micromodal-slide" id="modal-cropper" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1">
+        <div id="modal-box" class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-cropper-title">
+          <header id="modal-header">
+            <h2>Image editor</h2>
+            <button id="modal-cropper-close">
+              <i class="fa fa-times"></i>
+            </button>
+          </header>
+          <section id="modal-toolbar">
+            <div class="modal-toolbar-group" id="toolbar-set-drag-mode">
+              <button type="button" id="toolbar-move">
+                <i class="fa fa-arrows-alt"></i>
+              </button>
+              <button type="button" id="toolbar-crop">
+                <i class="fa fa-crop-alt"></i>
+              </button>
+            </div>
+            <div class="modal-toolbar-group" id="toolbar-set-zoom">
+              <button type="button" id="toolbar-zoom-plus">
+                <i class="fa fa-search-plus"></i>
+              </button>
+              <button type="button" id="toolbar-zoom-minus">
+                <i class="fa fa-search-minus"></i>
+              </button>
+            </div>
+            <div class="modal-toolbar-group" id="toolbar-set-move">
+              <button type="button" id="toolbar-move-left">
+                <i class="fa fa-arrow-left"></i>
+              </button>
+              <button type="button" id="toolbar-move-right">
+                <i class="fa fa-arrow-right"></i>
+              </button>
+              <button type="button" id="toolbar-move-up">
+                <i class="fa fa-arrow-up"></i>
+              </button>
+              <button type="button" id="toolbar-move-down">
+                <i class="fa fa-arrow-down"></i>
+              </button>
+            </div>
+            <div class="modal-toolbar-group" id="toolbar-set-rotate">
+              <button type="button" id="toolbar-set-rotate-left">
+                <i class="fa fa-undo-alt"></i>
+              </button>
+              <button type="button" id="toolbar-set-rotate-right">
+                <i class="fa fa-redo-alt"></i>
+              </button>
+            </div>
+            <div class="modal-toolbar-group" id="toolbar-set-scale">
+              <button type="button" id="toolbar-scale-x" data-option="-1">
+                <i class="fa fa-arrows-alt-h"></i>
+              </button>
+              <button type="button" id="toolbar-scale-y" data-option="-1">
+                <i class="fa fa-arrows-alt-v"></i>
+              </button>
+            </div>
+            <div class="modal-toolbar-group" id="toolbar-set-resolution">
+              <button type="button" id="toolbar-aspect-ratio-rounded">
+                <i class="fa fa-circle"></i>
+              </button>
+              <button type="button" id="toolbar-aspect-ratio-16-9">
+                16:9
+              </button>
+              <button type="button" id="toolbar-aspect-ratio-4-3">
+                4:3
+              </button>
+              <button type="button" id="toolbar-aspect-ratio-1-1">
+                1:1
+              </button>
+              <button type="button" id="toolbar-aspect-ratio-2-3">
+                2:3
+              </button>
+              <button type="button" id="toolbar-aspect-ratio-16-free">
+                Free
+              </button>
+            </div>
+          </section>
+          <section id="modal-content">
+            <img id="image-cropper" src="" alt="image">
+          </section>
+          <footer id="modal-footer">
+            <button id="modal-cropper-finalize">
+              <i class="fa fa-save"></i>
+              Finalizar
+            </button>
+          </footer>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      // elemento de img que será aplicado o cropper
+      const imageToCropper = document.getElementById('image-cropper');
+      // resultado da imagem base64 para iserir no editor
+      let imageBase64 = null;
+      // objeto que vai guardar a instancia do cropper
+      let cropperObj = null;
+      // armazena função que resolve a imagem depois de croppada
+      let resolveImage = null;
+      // armazena função que reject a imagem caso de erro ao croppar
+      let rejectImage = null;
+      // armazena modelo de recorte
+      let cropMode = 'rect'; // rect / circle
+      // options para cropper
+      let cropperOptions = {
+        aspectRatio: 16 / 9,
+        viewMode: 1,
+        ready: function (e) {
+          if (cropMode === 'circle') {
+            document.getElementsByClassName('cropper-view-box')[0].setAttribute("style", "border-radius: 50%;");
+            document.getElementsByClassName('cropper-face')[0].setAttribute("style", "border-radius: 50%;");
+          } else {
+            document.getElementsByClassName('cropper-view-box')[0].setAttribute("style", "border-radius: 0;");
+            document.getElementsByClassName('cropper-face')[0].setAttribute("style", "border-radius: 0;");
+          }
+        },
+        cropstart: function (e) {},
+        cropmove: function (e) {},
+        cropend: function (e) {},
+        crop: function (e) {},
+        zoom: function (e) {}
+      };
+
+      // função cria cropper
+      const createCropper = () => {
+        if (cropperObj) {
+          cropperObj.destroy();
+          cropperObj = null;  
+        }
+        cropperObj = new Cropper(imageToCropper, cropperOptions);
+      };
+      // função destroy cropper
+      const destroyCropper = () => {
+        cropperObj.destroy();
+        cropperObj = null;
+      };
+      // função que abre o modal
+      const openModalCropper = () => {
+        createCropper();
+        MicroModal.show('modal-cropper');
+      };
+
+      // função que fecha o modal
+      const closeModalCropper = () => {
+        rejectImage();
+        MicroModal.close('modal-cropper');
+        destroyCropper();
+        rejectImage = null;
+        resolveImage = null;
+        imageBase64 = null;
+        imageToCropper.src = '';
+      };
+
+      // função que retorna imagem cropada redonda
+      const getRoundedCanvas = (sourceCanvas) => {
+        var canvas = document.createElement('canvas');
+        var context = canvas.getContext('2d');
+        var width = sourceCanvas.width;
+        var height = sourceCanvas.height;
+
+        canvas.width = width;
+        canvas.height = height;
+        context.imageSmoothingEnabled = true;
+        context.drawImage(sourceCanvas, 0, 0, width, height);
+        context.globalCompositeOperation = 'destination-in';
+        context.beginPath();
+        context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI, true);
+        context.fill();
+        return canvas;
+      }
+
+      // click botões toolbar
+      document.getElementById('toolbar-move').addEventListener('click', () => {
+        cropperObj.setDragMode('move');
+      });
+      document.getElementById('toolbar-crop').addEventListener('click', () => {
+        cropperObj.setDragMode('crop');
+      });
+      document.getElementById('toolbar-zoom-plus').addEventListener('click', () => {
+        cropperObj.zoom(0.1);
+      });
+      document.getElementById('toolbar-zoom-minus').addEventListener('click', () => {
+        cropperObj.zoom(-0.1);
+      });
+      document.getElementById('toolbar-move-left').addEventListener('click', () => {
+        cropperObj.move(-10, 0);
+      });
+      document.getElementById('toolbar-move-right').addEventListener('click', () => {
+        cropperObj.move(10, 0);
+      });
+      document.getElementById('toolbar-move-up').addEventListener('click', () => {
+        cropperObj.move(0, -10);
+      });
+      document.getElementById('toolbar-move-down').addEventListener('click', () => {
+        cropperObj.move(0, 10);
+      });
+      document.getElementById('toolbar-set-rotate-left').addEventListener('click', () => {
+        cropperObj.rotate(-45);
+      });
+      document.getElementById('toolbar-set-rotate-right').addEventListener('click', () => {
+        cropperObj.rotate(45);
+      });
+      document.getElementById('toolbar-scale-x').addEventListener('click', (e) => {
+        const option = e.target.getAttribute('data-option');
+        cropperObj.scaleX(option);
+        e.target.setAttribute('data-option', option > 0 ? -1 : 1);
+      });
+      document.getElementById('toolbar-scale-y').addEventListener('click', (e) => {
+        const option = e.target.getAttribute('data-option');
+        cropperObj.scaleY(option);
+        e.target.setAttribute('data-option', option > 0 ? -1 : 1);
+      });
+      document.getElementById('toolbar-aspect-ratio-rounded').addEventListener('click', () => {
+        cropperOptions.aspectRatio = 1;
+        cropMode = 'circle';
+        createCropper();
+      });
+      document.getElementById('toolbar-aspect-ratio-16-9').addEventListener('click', () => {
+        cropperOptions.aspectRatio = 1.7777777777777777;
+        cropMode = 'rect';
+        createCropper();
+      });
+      document.getElementById('toolbar-aspect-ratio-4-3').addEventListener('click', () => {
+        cropperOptions.aspectRatio = 1.3333333333333333;
+        cropMode = 'rect';
+        createCropper();
+      });
+      document.getElementById('toolbar-aspect-ratio-1-1').addEventListener('click', () => {
+        cropperOptions.aspectRatio = 1;
+        cropMode = 'rect';
+        createCropper();
+      });
+      document.getElementById('toolbar-aspect-ratio-2-3').addEventListener('click', () => {
+        cropperOptions.aspectRatio = 0.6666666666666666;
+        cropMode = 'rect';
+        createCropper();
+      });
+      document.getElementById('toolbar-aspect-ratio-16-free').addEventListener('click', () => {
+        cropperOptions.aspectRatio = NaN;
+        cropMode = 'rect';
+        createCropper();
+      });
+      
+        // click botão close
+      document.getElementById('modal-cropper-close').addEventListener('click', () => {
+        closeModalCropper();
+      });
+
+      // click botão finalizar
+      document.getElementById('modal-cropper-finalize').addEventListener('click', () => {
+        const dataCanvas = cropperObj.getCroppedCanvas();
+        let dataImage = null;
+        if (cropMode === 'circle') {
+          dataImage = getRoundedCanvas(dataCanvas).toDataURL();
+        } else {
+          dataImage = dataCanvas.toDataURL();
+        }
+        resolveImage(dataImage);
+        closeModalCropper();
+      });
+      
+      // registra modulo de imageUploader no quill
+      Quill.register("modules/imageUploader", ImageUploader);
+      
+      // instancia do quill
+      const quill = new Quill('#editor-container', {
+        modules: {
+          toolbar: {
+            container: [
+              ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+              ['blockquote', 'code-block'],
+              [{ 'header': 1 }, { 'header': 2 }], // custom button values
+              [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+              [{ 'script':'sub'}, { 'script': 'super' }], // superscript/subscript
+              [{ 'indent': '-1'}, { 'indent': '+1' }], // outdent/indent
+              [{ 'direction': 'rtl' }], // text direction
+              [{ 'size': ['small', false, 'large', 'huge'] }], // custom dropdown
+              [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+              [{ 'color': [] }, { 'background': [] }], // dropdown with defaults from theme
+              [{ 'font': [] }],
+              [{ 'align': [] }],
+              ['clean'], // remove formatting button
+              ['link', 'image', 'video'],
+            ],
+          },
+          imageUploader: {
+            upload: async file => {
+              imageBase64 = await toBase64(file); // converte imagem blob em base64
+              return new Promise((resolve, reject) => {
+                imageToCropper.src = imageBase64; // set imagem selecionada
+                resolveImage = resolve; // set função resolve
+                rejectImage = reject; // set função reject
+                openModalCropper(); // abre modal com cropper
+              });
+            }
+          }
+        },
+        placeholder: 'Insert text...', // placeholder do campo
+        theme: 'snow', // tema
+      });
+    });
+  </script>
+</body>
+</html>
